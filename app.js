@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
+const { adminAuth } = require('./Middleware/auth');
 
+/*
 app.get('/user', (req, res) => {
     console.log(req.query);
     console.log('Hello route accessed');
@@ -75,6 +77,56 @@ app.patch('/hellopatch', (req, res) => {
 //     console.log('Server started');
 //     res.send('Hello Melody');
 // });
+*/
+
+app.use('/user', [(req, res, next) => {
+    console.log('user rout access');
+    // res.send('Response!!!!!!!');
+    next();// it will call the next middleware in the stack
+}, (req, res, next) => {
+    console.log('This is a second middleware for user route');
+    //res.send('This is a second middleware for user route');
+    next()
+//when we use next() in the first middleware, it will call the second middleware and we are using same url and already sent the response in the first middleware, so it will throw an error 
+}], (req, res, next) => {
+    console.log('This is a third middleware for user route');
+ 
+    res.send('This is a third middleware for user route');
+    //next();
+}, (req, res, next) => {
+    console.log('This is a fourth middleware for user route')
+    res.send('This is a fourth middleware for user route');
+   // next();
+});
+
+
+
+//Middlerware to handle all requests
+// app.use('/admin', (req, res, next) => {
+//     const TOKEN = 'XYZ'
+//     const Authorization = TOKEN === 'XYZ';
+//     if (!Authorization) {
+//         return res.status(401).send('Unauthorized access');
+//     } else {
+//         console.log('Admin route accessed');
+//         next();
+//     }
+
+// })
+
+app.use('/admin', adminAuth);
+
+app.get('/admin/getAllData', (req, res) => {
+    console.log('Admin GET route accessed');
+    res.send('Admin GET ALl USER Data');
+})
+
+app.delete('/admin/deleteUser', (req, res) => {
+    console.log('Admin DELETE route accessed');
+    res.send('Admin DELETE User Data');
+});
+
+
 
 const PORT = 7777;
 

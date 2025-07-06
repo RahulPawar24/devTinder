@@ -28,7 +28,43 @@
 - next function and errors along with res.send()
 - app.use("/route", rH, [rH2, rH3], rH4, rh5);
 - What is a Middleware? Why do we need it?
+  A middleware in Express.js is a function that has access to the request (req), response (res), and the next middleware function in the application’s request-response cycle. Middleware functions can execute code, modify the request and response objects, end the request-response cycle, or call the next middleware in the stack.
+
+        Why do we need middleware?
+
+        To perform common tasks like logging, authentication, parsing request bodies, error handling, etc.
+        To keep code modular and reusable by separating concerns.
+        To process requests in a sequence, allowing each middleware to handle a specific responsibility before passing control to the next.
+
+        app.use((req, res, next) => {
+        console.log('Request received');
+        next(); // Passes control to the next middleware
+        });
+
 - How express JS basically handles requests behind the scenes
+  When Express.js receives a request, it handles it behind the scenes as follows:
+
+            Incoming Request:
+            The HTTP request arrives at the Express server.
+
+            Middleware Stack:
+            Express maintains a stack (list) of middleware and route handlers. Each middleware function can process the request, modify it, or pass it along.
+
+            Routing:
+            Express checks each middleware and route in order. If a route matches the request path and method, its handler is called.
+
+            Request/Response Objects:
+            Express creates req (request) and res (response) objects for each request, which are passed to all middleware and route handlers.
+
+            Calling next():
+            Middleware functions call next() to pass control to the next function in the stack. If a middleware ends the response (with res.send(), res.json(), etc.), the cycle stops.
+
+            Response Sent:
+            Once a response is sent, Express finishes processing the request.
+
+            Summary:
+            Express processes requests by passing them through a chain of middleware and route handlers, allowing you to handle, modify, or respond to requests at each step.
+
 - Difference app.use and app.all
 - Write a dummy auth middleware for admin
 - Write a dummy auth middleware for all user routes, except /user/login
