@@ -1,7 +1,64 @@
 const express = require('express');
 const app = express();
 const { adminAuth } = require('./Middleware/auth');
+const connectDB=require('./Config/database')
 
+const User = require('./Model/user');
+
+app.use(express.json()); // Middleware to parse JSON request bodies
+const PORT = 7777;
+
+connectDB()
+    .then(() => {
+        console.log('Database connected successfully');
+        app.listen(PORT, () => {
+            console.log(`server listening on port ${PORT}`);
+        })
+    })
+    .catch((err) => {
+        console.error('Database connection failed:', err);
+})
+
+
+app.post('/signup', async (req, res) => {
+    const user = new User (req.body)
+   
+    try {
+        user.save(user);
+        res.send('User added successfully');
+    } catch (error) {
+        res.status(500).send('Error adding user: ' + error.message);
+    }
+})
+
+app.get('/userData', async (req, res) => {
+    try {
+        const userEmail = req.body.email;
+        const userData = await User.find({ email: userEmail });
+        if (userData.length === 0) {
+            return res.status(404).send('No user data found');
+        }
+        res.send(userData);
+
+    }catch (error) {
+        res.status(500).send('Error fetching user data: ' + error.message);
+    }
+})
+
+app.get('/feed', async (req, res) => {
+    try {
+        const feedData = await User.find({});
+        if (feedData.length === 0) {
+            return res.status(404).send('No feed data found');
+        }
+        res.send(feedData);
+        
+    } catch (error) {
+        res.status(500).send('Error fetching feed: ' + error.message);
+    }
+})
+
+/*
 /*
 app.get('/user', (req, res) => {
     console.log(req.query);
@@ -78,7 +135,7 @@ app.patch('/hellopatch', (req, res) => {
 //     res.send('Hello Melody');
 // });
 */
-
+/*
 app.use('/user', [(req, res, next) => {
     console.log('user rout access');
     // res.send('Response!!!!!!!');
@@ -98,7 +155,7 @@ app.use('/user', [(req, res, next) => {
     res.send('This is a fourth middleware for user route');
    // next();
 });
-
+*/
 
 
 //Middlerware to handle all requests
@@ -127,9 +184,3 @@ app.delete('/admin/deleteUser', (req, res) => {
 });
 
 
-
-const PORT = 7777;
-
-app.listen(PORT, () => {
-    console.log(`server listening on port ${PORT}`);
-})
